@@ -1,21 +1,53 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-
-	"github.com/iTsLhaj/gator/internal/config"
+	"os"
 )
 
 func main() {
+	var err error
+	var st *state
+	var cmds *commands
 
-	gatorConfig, _ := config.Read()
-	gatorConfig.SetUser("Kenzo")
+	if len(os.Args) < 2 {
+		fmt.Println(errors.New("not enough arguments were provided"))
+		os.Exit(1)
+	}
 
-	gatorConfig, _ = config.Read()
-	fmt.Printf("Config: %+v\n\t- Database URL: %s\n\t- Username: %s\n",
-		gatorConfig,
-		gatorConfig.DbUrl,
-		gatorConfig.Username,
-	)
+	cmd := os.Args[1]
+	args := os.Args[2:]
 
+	st, err = initState()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	cmdsRegister := commandsRegister{
+		"login":     handlerLogin,
+		"register":  handlerRegister,
+		"reset":     handlerReset,
+		"users":     handlerUsers,
+		"agg":       handlerAgg,
+		"addfeed":   handlerAddFeed,
+		"feeds":     handlerFeeds,
+		"follow":    handlerFollow,
+		"following": handlerFollowing,
+	}
+	cmds, err = initCommands(cmdsRegister)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	err = cmds.run(st, command{
+		name: cmd,
+		args: args,
+	})
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

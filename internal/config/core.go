@@ -2,18 +2,18 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"strings"
 )
 
-func (c *Config) SetUser(username string) {
+func (c *Config) SetUser(username string) error {
 	c.Username = username
 	err := c.write()
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
+	return nil
 }
 
 func (c *Config) write() error {

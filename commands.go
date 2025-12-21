@@ -101,16 +101,27 @@ func handlerUsers(s *state, cmd command, user database.User) error {
 }
 
 func handlerAgg(s *state, cmd command, user database.User) error {
-	if len(cmd.args) > 0 {
-		return errors.New("`agg` has no arguments")
+	if len(cmd.args) < 1 {
+		return errors.New("`agg` <time_between_reqs>")
 	}
 
-	feedURL := "https://www.wagslane.dev/index.xml"
-	feed, err := fetchFeed(context.Background(), feedURL)
+	duration, err := time.ParseDuration(cmd.args[0])
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%v\n", feed)
+	fmt.Printf("Collecting feeds every %v\n", duration)
+
+	ticker := time.NewTicker(duration)
+	for ; ; <-ticker.C {
+		scrapeFeeds(s)
+	}
+
+	//feedURL := "https://www.wagslane.dev/index.xml"
+	//feed, err := fetchFeed(context.Background(), feedURL)
+	//if err != nil {
+	//	return err
+	//}
+	//fmt.Printf("%v\n", feed)
 
 	return nil
 }

@@ -50,7 +50,7 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 	}
 
 	body = []byte(html.UnescapeString(string(body)))
-	for _, e := range []string{"&rsquo;", "&ndash;", "&ldquo;", "&rdquo;"} {
+	for _, e := range []string{"&rsquo;", "&ndash;", "&ldquo;", "&rdquo;", "&hellip;"} {
 		body = []byte(strings.Replace(string(body), e, "", -1))
 	}
 	err = xml.Unmarshal(body, &feed)

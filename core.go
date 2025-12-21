@@ -126,3 +126,27 @@ func feedListPrettier(s *state, fl []database.Feed) error {
 
 	return nil
 }
+
+func scrapeFeeds(s *state) error {
+	feed, err := s.q.GetNextFeedToFetch(context.Background())
+	if err != nil {
+		return err
+	}
+
+	err = s.q.MarkFeedFetched(context.Background(), feed.ID)
+	if err != nil {
+		return err
+	}
+
+	var rssFeed *RSSFeed
+	rssFeed, err = fetchFeed(context.Background(), feed.Url)
+	if err != nil {
+		return err
+	}
+
+	for _, feedItem := range rssFeed.Channel.Item {
+		fmt.Printf(" - %s\n", feedItem.Title)
+	}
+
+	return nil
+}

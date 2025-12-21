@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -115,13 +116,6 @@ func handlerAgg(s *state, cmd command, user database.User) error {
 	for ; ; <-ticker.C {
 		scrapeFeeds(s)
 	}
-
-	//feedURL := "https://www.wagslane.dev/index.xml"
-	//feed, err := fetchFeed(context.Background(), feedURL)
-	//if err != nil {
-	//	return err
-	//}
-	//fmt.Printf("%v\n", feed)
 
 	return nil
 }
@@ -265,5 +259,28 @@ func handlerUnfollow(s *state, cmd command, user database.User) error {
 		}
 	}
 
+	return nil
+}
+
+func handlerBrowse(s *state, cmd command, user database.User) error {
+	var err error
+	var limit int = 2
+
+	if len(cmd.args) > 0 {
+		limit, err = strconv.Atoi(cmd.args[0])
+		if err != nil {
+			return err
+		}
+	}
+
+	var posts []database.Post
+	posts, err = s.q.GetPosts(context.Background(), int32(limit))
+	if err != nil {
+		return err
+	}
+
+	for _, post := range posts {
+		fmt.Printf(" - %s\n", post.Title)
+	}
 	return nil
 }

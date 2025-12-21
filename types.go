@@ -26,7 +26,7 @@ type (
 
 	commandHandler func(*state, command) error
 
-	commandsRegister map[string]commandHandler
+	commandsRegister map[string]func(*state, command, database.User) error
 )
 
 func (c *commands) run(s *state, cmd command) error {
@@ -35,7 +35,8 @@ func (c *commands) run(s *state, cmd command) error {
 		return errors.New("unknown command: " + cmd.name)
 	}
 
-	err := handler(s, cmd)
+	handler_ := middlewareLoggedIn(handler)
+	err := handler_(s, cmd)
 	if err != nil {
 		return err
 	}
@@ -43,7 +44,7 @@ func (c *commands) run(s *state, cmd command) error {
 	return nil
 }
 
-func (c *commands) register(name string, handler commandHandler) error {
+func (c *commands) register(name string, handler func(*state, command, database.User) error) error {
 	if _, ok := c.cmdsList[name]; ok {
 		return errors.New("already registered command: " + name)
 	}

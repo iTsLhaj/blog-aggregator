@@ -36,6 +36,6 @@ CREATE TABLE IF NOT EXISTS feed_follows (
 );
 
 -- +goose Down
-DROP TABLE IF EXISTS users;
-
+DROP TABLE IF EXISTS feed_follows;
 DROP TABLE IF EXISTS feeds;
+DROP TABLE IF EXISTS users;

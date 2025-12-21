@@ -35,6 +35,7 @@ func main() {
 		"feeds":     handlerFeeds,
 		"follow":    handlerFollow,
 		"following": handlerFollowing,
+		"unfollow":  handlerUnfollow,
 	}
 	cmds, err = initCommands(cmdsRegister)
 	if err != nil {
